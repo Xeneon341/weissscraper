@@ -1,19 +1,14 @@
-import os, re, xlrd, openpyxl
+import os, xlrd
+from dotenv import load_dotenv
 
-path = r"C:\Users\Alex Thompson\Barbaras Development Inc\NP - Documents\NP-Share\Weiss"
+load_dotenv()
 
-def extract_containers(any_list):
-
-
-    return any_list
-
-
-def extract_weiss_files(directory):
+def extract_weiss_files():
     filelist = []
     container_list = []
     filtered_filelist = []
 
-    loc = (os.path.join(directory, "Templates\container_config.xls"))
+    loc = (os.path.join(os.getenv('PATH'), "Templates\container_config.xls"))
 
     wb = xlrd.open_workbook(loc)
     sheet = wb.sheet_by_index(0)
@@ -22,7 +17,7 @@ def extract_weiss_files(directory):
     for i in range(sheet.nrows):
         container_list.append(sheet.cell_value(i, 0))
 
-    for root, dirs, files in os.walk(directory):
+    for root, dirs, files in os.walk(os.getenv('PATH')):
         for file in files:
             filelist.append(os.path.join(root,file))
 
@@ -35,4 +30,3 @@ def extract_weiss_files(directory):
 
     return filtered_filelist
 
-print(extract_weiss_files(path))
