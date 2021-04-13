@@ -26,9 +26,13 @@ def extract_weiss_files(directory, any_list):
     return any_list
 
 def filter_files(string, substr):
-    filtered_filelist.append(str for str in string if
-                            any(sub in str for sub in substr))
+    for str in string:
+        for sub in substr:
+            if sub in str:
+                filtered_filelist.append(str)
+    # filtered_filelist.append(str for str in string if
+    #                         any(sub in str for sub in substr))
 
     return filtered_filelist
 
-print([i for i in filter_files(extract_weiss_files(path, filelist), extract_containers(container_list))])
+print(filter_files(extract_weiss_files(path, filelist), extract_containers(container_list)))
