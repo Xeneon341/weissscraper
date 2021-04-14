@@ -35,8 +35,7 @@ sheet = book.active
 for row in tupled_rows:
     sheet.append(row)
 
-# print([n for n in range(last_empty_row_list)])
-print([n for n in enumerate(last_empty_row_list)])
+print(updated_empty_rows, last_empty_row_list)
 
 for updated_last_row in updated_empty_rows:
     # Update CM3 Multiplier Cell
@@ -63,10 +62,15 @@ for updated_last_row in updated_empty_rows:
     # Update Duty + Tariff Checks
     sheet.cell(row = updated_last_row - 6, column = 12).value = \
         '=+L' + str(updated_last_row - 8) + '-L' + str(updated_last_row - 7)
+    print(updated_last_row)
     # for last_row in last_empty_row_list:
-    #     sheet.cell()
+        # print(updated_last_row)
+        # for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 11))):
+            # sheet.cell(row = row, column = 7).value = \
+            #     '=F' + str(row) + '*$H$' + str(updated_last_row - 2)
+            # print(row)
 
-for i in range(1,11):
-    sheet.cell(row=1, column=i).value = 'does this work?'
-
-book.save(os.path.join(PATH,"sample.xlsx"))
+# for i in range(1,11):
+#     sheet.cell(row=1, column=i).value = 'does this work?'
+#
+# book.save(os.path.join(PATH,"sample.xlsx"))
