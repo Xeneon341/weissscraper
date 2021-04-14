@@ -1,12 +1,11 @@
-import os
+import os, easygui
 import numpy as np
-import easygui
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH2
+from settings import PATH
 
-extracted_files, container_dict = extract_weiss_files()
+extracted_files, container_dict, invoice_list = extract_weiss_files()
 rows = []
 data_rows = []
 last_empty_row_list = []
@@ -102,4 +101,10 @@ for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
             '=H' + str(row) + '*((I' + str(row) + \
             '/100)+0.003464+.00125)'
 
-book.save(os.path.join(PATH2, dialogue_box() + '.xlsx'))
+dialog_answer = dialogue_box()
+
+book.save(os.path.join(PATH, dialog_answer + '.xlsx'))
+
+with open(os.path.join(PATH, dialog_answer + '.txt'), 'w') as file:
+    for inv in invoice_list:
+        file.write("%s\n" % inv)
