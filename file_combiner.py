@@ -3,12 +3,13 @@ import numpy as np
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH
+from settings import PATH2
 
-extracted_files = extract_weiss_files()
+extracted_files, container_dict = extract_weiss_files()
 rows = []
 data_rows = []
 last_empty_row_list = []
+container_list_dict_values = list(container_dict.values())
 
 for i in extracted_files:
     wb_data_only = load_workbook(filename = i, data_only=True)
@@ -35,7 +36,9 @@ sheet = book.active
 for row in tupled_rows:
     sheet.append(row)
 
-print(updated_empty_rows, last_empty_row_list)
+for amount, updated_last_row in zip(container_list_dict_values, updated_empty_rows):
+    # Update Invoice Amount
+    sheet.cell(row = updated_last_row - 4, column = 8).value = amount
 
 for updated_last_row in updated_empty_rows:
     # Update CM3 Multiplier Cell
@@ -62,15 +65,35 @@ for updated_last_row in updated_empty_rows:
     # Update Duty + Tariff Checks
     sheet.cell(row = updated_last_row - 6, column = 12).value = \
         '=+L' + str(updated_last_row - 8) + '-L' + str(updated_last_row - 7)
-    print(updated_last_row)
-    # for last_row in last_empty_row_list:
-        # print(updated_last_row)
-        # for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 11))):
-            # sheet.cell(row = row, column = 7).value = \
-            #     '=F' + str(row) + '*$H$' + str(updated_last_row - 2)
-            # print(row)
+    # Update Freight Amount. Will equal total of the container charges or invoice
+    sheet.cell(row = updated_last_row - 7, column = 7).value = \
+        '=+H' + str(updated_last_row - 4)
+    # Update Duty + Tariff Amount. It's 0 because additional charges don't have d/t tacked on
+    sheet.cell(row = updated_last_row - 7, column = 12).value = 0
 
-# for i in range(1,11):
-#     sheet.cell(row=1, column=i).value = 'does this work?'
-#
-# book.save(os.path.join(PATH,"sample.xlsx"))
+for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
+    # Update Quantity SUM
+    sheet.cell(row = updated_last_row - 8, column = 5).value = \
+        '=+SUM(E' + str(3 + (updated_last_row - last_row)) + ':E' + str(1 + (updated_last_row - 11)) + ')'
+    # Update CBM SUM
+    sheet.cell(row = updated_last_row - 8, column = 6).value = \
+        '=+SUM(F' + str(3 + (updated_last_row - last_row)) + ':F' + str(1 + (updated_last_row - 11)) + ')'
+    # Update Freight SUM
+    sheet.cell(row = updated_last_row - 8, column = 7).value = \
+        '=+SUM(G' + str(3 + (updated_last_row - last_row)) + ':G' + str(1 + (updated_last_row - 11)) + ')'
+    # Update Invoice SUM
+    sheet.cell(row = updated_last_row - 8, column = 8).value = \
+        '=+SUM(H' + str(3 + (updated_last_row - last_row)) + ':H' + str(1 + (updated_last_row - 11)) + ')'
+    # Update Duty + Tariff SUM
+    sheet.cell(row = updated_last_row - 8, column = 12).value = \
+        '=+SUM(L' + str(3 + (updated_last_row - last_row)) + ':L' + str(1 + (updated_last_row - 11)) + ')'
+    for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 11))):
+        sheet.cell(row = row, column = 7).value = \
+            '=F' + str(row) + '*$H$' + str(updated_last_row - 2)
+        sheet.cell(row = row, column = 9).value = \
+            '=+K' + str(row) + '+J' + str(row)
+        sheet.cell(row = row, column = 12).value = \
+            '=H' + str(row) + '*((I' + str(row) + \
+            '/100)+0.003464+.00125)'
+
+book.save(os.path.join(PATH2,"sample2.xlsx"))
