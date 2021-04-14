@@ -35,7 +35,38 @@ sheet = book.active
 for row in tupled_rows:
     sheet.append(row)
 
-for last_row in updated_empty_rows:
-    sheet.cell(row = last_row - 1, column=5).value = 'Hey!'
+# print([n for n in range(last_empty_row_list)])
+print([n for n in enumerate(last_empty_row_list)])
+
+for updated_last_row in updated_empty_rows:
+    # Update CM3 Multiplier Cell
+    sheet.cell(row = updated_last_row - 2, column = 8).value = \
+        '=+H' + str(updated_last_row - 3) + '/F' + str(updated_last_row - 8)
+    # Update Minus Duty Cell
+    sheet.cell(row = updated_last_row - 3, column = 8).value = \
+        '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
+    # Update Freight total
+    sheet.cell(row = updated_last_row - 3, column = 7).value = \
+        '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
+    # Update Quantity Checks
+    sheet.cell(row = updated_last_row - 6, column = 5).value = \
+        '=+E' + str(updated_last_row - 8) + '-E' + str(updated_last_row - 7)
+    # Update CBM/GW Checks
+    sheet.cell(row = updated_last_row - 6, column = 6).value = \
+        '=+F' + str(updated_last_row - 8) + '-F' + str(updated_last_row - 7)
+    # Update Freight Checks
+    sheet.cell(row = updated_last_row - 6, column = 7).value = \
+        '=+G' + str(updated_last_row - 8) + '-G' + str(updated_last_row - 7)
+    # Update Factory Invoice Total Checks
+    sheet.cell(row = updated_last_row - 6, column = 8).value = \
+        '=+H' + str(updated_last_row - 8) + '-H' + str(updated_last_row - 7)
+    # Update Duty + Tariff Checks
+    sheet.cell(row = updated_last_row - 6, column = 12).value = \
+        '=+L' + str(updated_last_row - 8) + '-L' + str(updated_last_row - 7)
+    # for last_row in last_empty_row_list:
+    #     sheet.cell()
+
+for i in range(1,11):
+    sheet.cell(row=1, column=i).value = 'does this work?'
 
 book.save(os.path.join(PATH,"sample.xlsx"))
