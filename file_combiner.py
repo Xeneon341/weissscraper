@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import easygui
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
@@ -10,6 +11,11 @@ rows = []
 data_rows = []
 last_empty_row_list = []
 container_list_dict_values = list(container_dict.values())
+
+def dialogue_box():
+    file_name = easygui.enterbox("What would like you to call your file?")
+
+    return file_name
 
 for i in extracted_files:
     wb_data_only = load_workbook(filename = i, data_only=True)
@@ -96,4 +102,4 @@ for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
             '=H' + str(row) + '*((I' + str(row) + \
             '/100)+0.003464+.00125)'
 
-book.save(os.path.join(PATH2,"sample2.xlsx"))
+book.save(os.path.join(PATH2, dialogue_box() + '.xlsx'))
