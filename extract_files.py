@@ -1,5 +1,5 @@
 import os, xlrd, re
-from settings import PATH
+from settings import PATH2
 from openpyxl import load_workbook, Workbook
 
 def extract_weiss_files():
@@ -7,7 +7,7 @@ def extract_weiss_files():
     filtered_filelist = []
     invoice_list = []
 
-    loc = (os.path.join(PATH, "Templates\container_config.xls"))
+    loc = (os.path.join(PATH2, "Templates\container_config.xls"))
 
     wb = xlrd.open_workbook(loc)
     sheet = wb.sheet_by_index(0)
@@ -19,7 +19,7 @@ def extract_weiss_files():
     container_list_dict = dict(container_list)
     container_list_dict_values = list(container_list_dict.keys())
 
-    for root, dirs, files in os.walk(PATH):
+    for root, dirs, files in os.walk(PATH2):
         for file in files:
             filelist.append(os.path.join(root,file))
 
@@ -39,11 +39,10 @@ def extract_weiss_files():
 
 def extract_from_export_file():
     last_empty_row_list = []
-    loc = (os.path.join(PATH, "Templates\importrs_exp.xlsx"))
+    loc = (os.path.join(PATH2, "Templates\importrs_exp.xlsx"))
     wb_data_only = load_workbook(filename = loc, data_only=True)
 
     sheet_ranges_data_only = wb_data_only['Purch. Inv. Line']
 
     last_empty_row_list.append(len(list(sheet_ranges_data_only.rows)))
 
-extract_from_export_file()

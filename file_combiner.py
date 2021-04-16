@@ -3,7 +3,7 @@ import numpy as np
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH
+from settings import PATH2
 
 extracted_files, container_dict, invoice_list = extract_weiss_files()
 rows = []
@@ -35,123 +35,167 @@ def run_file_combiner():
                         c13.value, c14.value, c15.value))
 
 
-        tupled_rows = tuple(rows)
-        tupled_data_rows = tuple(data_rows)
-        updated_empty_rows = np.cumsum(last_empty_row_list)
+    tupled_rows = tuple(rows)
+    tupled_data_rows = tuple(data_rows)
+    updated_empty_rows = np.cumsum(last_empty_row_list)
 
-        book = Workbook()
-        sheet = book.active
+    book = Workbook()
+    sheet = book.active
 
-        for row in tupled_rows:
-            sheet.append(row)
+    for row in tupled_rows:
+        sheet.append(row)
 
-        for amount, updated_last_row in zip(container_list_dict_values, updated_empty_rows):
-            # Update Invoice Amount
-            sheet.cell(row = updated_last_row - 4, column = 8).value = amount
+    # print([n for n in zip(updated_empty_rows, last_empty_row_list)])
 
-        for updated_last_row in updated_empty_rows:
-            # Update CM3 Multiplier Cell
-            sheet.cell(row = updated_last_row - 2, column = 8).value = \
-                '=+H' + str(updated_last_row - 3) + '/F' + str(updated_last_row - 8)
-            # Update Minus Duty Cell
-            sheet.cell(row = updated_last_row - 3, column = 8).value = \
-                '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
-            # Update Freight total
-            sheet.cell(row = updated_last_row - 3, column = 7).value = \
-                '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
-            # Update Quantity Checks
-            sheet.cell(row = updated_last_row - 6, column = 5).value = \
-                '=+E' + str(updated_last_row - 8) + '-E' + str(updated_last_row - 7)
-            # Update CBM/GW Checks
-            sheet.cell(row = updated_last_row - 6, column = 6).value = \
-                '=+F' + str(updated_last_row - 8) + '-F' + str(updated_last_row - 7)
-            # Update Freight Checks
-            sheet.cell(row = updated_last_row - 6, column = 7).value = \
-                '=+G' + str(updated_last_row - 8) + '-G' + str(updated_last_row - 7)
-            # Update Factory Invoice Total Checks
-            sheet.cell(row = updated_last_row - 6, column = 8).value = \
-                '=+H' + str(updated_last_row - 8) + '-H' + str(updated_last_row - 7)
-            # Update Duty + Tariff Checks
-            sheet.cell(row = updated_last_row - 6, column = 12).value = \
-                '=+L' + str(updated_last_row - 8) + '-L' + str(updated_last_row - 7)
-            # Update Freight Amount. Will equal total of the container charges or invoice
-            sheet.cell(row = updated_last_row - 7, column = 7).value = \
-                '=+H' + str(updated_last_row - 4)
-            # Update Duty + Tariff Amount. It's 0 because additional charges don't have d/t tacked on
-            sheet.cell(row = updated_last_row - 7, column = 12).value = 0
-            # Update Invoice Check Total
-            sheet.cell(row = updated_last_row - 7, column = 14).value = \
-                '=+H' + str(updated_last_row - 4)
+    for amount, updated_last_row in zip(container_list_dict_values, updated_empty_rows):
+        # Update Invoice Amount
+        sheet.cell(row = updated_last_row - 4, column = 8).value = amount
 
-        for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
-            # Update Quantity SUM
-            sheet.cell(row = updated_last_row - 8, column = 5).value = \
-                '=+SUM(E' + str(3 + (updated_last_row - last_row)) + ':E' + str(1 + (updated_last_row - 11)) + ')'
-            # Update CBM SUM
-            sheet.cell(row = updated_last_row - 8, column = 6).value = \
-                '=+SUM(F' + str(3 + (updated_last_row - last_row)) + ':F' + str(1 + (updated_last_row - 11)) + ')'
-            # Update Freight SUM
-            sheet.cell(row = updated_last_row - 8, column = 7).value = \
-                '=+SUM(G' + str(3 + (updated_last_row - last_row)) + ':G' + str(1 + (updated_last_row - 11)) + ')'
-            # Update Invoice SUM
-            sheet.cell(row = updated_last_row - 8, column = 8).value = \
-                '=+SUM(H' + str(3 + (updated_last_row - last_row)) + ':H' + str(1 + (updated_last_row - 11)) + ')'
-            # Update Duty + Tariff SUM
-            sheet.cell(row = updated_last_row - 8, column = 12).value = \
-                '=+SUM(L' + str(3 + (updated_last_row - last_row)) + ':L' + str(1 + (updated_last_row - 11)) + ')'
-            # Update Freight + Duty SUM
-            sheet.cell(row = updated_last_row - 8, column = 14).value = \
-                '=+SUM(N' + str(3 + (updated_last_row - last_row)) + ':N' + str(1 + (updated_last_row - 11)) + ')'
-            # Update Freight SUM
-            sheet.cell(row = updated_last_row - 8, column = 15).value = \
-                '=+SUM(O' + str(3 + (updated_last_row - last_row)) + ':O' + str(1 + (updated_last_row - 11)) + ')'
-            for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 11))):
-                sheet.cell(row = row, column = 7).value = \
-                    '=F' + str(row) + '*$H$' + str(updated_last_row - 2)
-                sheet.cell(row = row, column = 9).value = \
-                    '=+K' + str(row) + '+J' + str(row)
-                sheet.cell(row = row, column = 12).value = \
-                    '=H' + str(row) + '*((I' + str(row) + \
-                    '/100)+0.003464+.00125)'
+    # print(updated_empty_rows)
 
-            for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
-                print(row)
-                if sheet.cell(row = row, column = 1).value is None:
-                    blank_rows.extend([row - 1, row + 1])
+    for updated_last_row in updated_empty_rows:
+        # Update CM3 Multiplier Cell
+        sheet.cell(row = updated_last_row - 2, column = 8).value = \
+            '=+H' + str(updated_last_row - 3) + '/F' + str(updated_last_row - 8)
+        # Update Minus Duty Cell
+        sheet.cell(row = updated_last_row - 3, column = 8).value = \
+            '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
+        # Update Freight total
+        sheet.cell(row = updated_last_row - 3, column = 7).value = \
+            '=+H' + str(updated_last_row - 4) + '-L' + str(updated_last_row - 7)
+        # Update Quantity Checks
+        sheet.cell(row = updated_last_row - 6, column = 5).value = \
+            '=+E' + str(updated_last_row - 8) + '-E' + str(updated_last_row - 7)
+        # Update CBM/GW Checks
+        sheet.cell(row = updated_last_row - 6, column = 6).value = \
+            '=+F' + str(updated_last_row - 8) + '-F' + str(updated_last_row - 7)
+        # Update Freight Checks
+        sheet.cell(row = updated_last_row - 6, column = 7).value = \
+            '=+G' + str(updated_last_row - 8) + '-G' + str(updated_last_row - 7)
+        # Update Factory Invoice Total Checks
+        sheet.cell(row = updated_last_row - 6, column = 8).value = \
+            '=+H' + str(updated_last_row - 8) + '-H' + str(updated_last_row - 7)
+        # Update Duty + Tariff Checks
+        sheet.cell(row = updated_last_row - 6, column = 12).value = \
+            '=+L' + str(updated_last_row - 8) + '-L' + str(updated_last_row - 7)
+        # Update Freight Amount. Will equal total of the container charges or invoice
+        sheet.cell(row = updated_last_row - 7, column = 7).value = \
+            '=+H' + str(updated_last_row - 4)
+        # Update Duty + Tariff Amount. It's 0 because additional charges don't have d/t tacked on
+        sheet.cell(row = updated_last_row - 7, column = 12).value = 0
+        # Update Invoice Check Total
+        sheet.cell(row = updated_last_row - 7, column = 14).value = \
+            '=+H' + str(updated_last_row - 4)
 
-            # blank_rows_tupled = zip(blank_rows[0::2], blank_rows[1::2])
 
-            for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
-                if sheet.cell(row = row, column = 1).value is None:
-                    top_of_rows = str((3 + (updated_last_row - last_row)))
-                    bottom_of_rows = str((1 + (updated_last_row - 10)))
-                    sheet.cell(row = row, column = 14).value = \
-                        '=$O' + str(row)
-                    sheet.cell(row = row, column = 15).value = \
-                        '=+@IF(@ISNA(IFS(ISNUMBER(SEARCH("DS",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
-                        ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I4,$B$' + top_of_rows + ':$B$' + \
-                        bottom_of_rows + ',B' + str(row - 1) + '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
-                        ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + \
-                        top_of_rows + ':$B$' + bottom_of_rows + ',"DT*"))),SUMIFS($G$' + top_of_rows + ':$G$' + \
-                        bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + \
-                        ':$B$' + bottom_of_rows + ',"<>DS*",$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"<>DT*"),IFS(ISNUMBER(SEARCH("DS",B' + \
-                        str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + \
-                        bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',B' + str(row - 1) + \
-                        '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + \
-                        ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"DT*")))'
+    for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
+        # print(updated_last_row)
+        # Update Quantity SUM
+        sheet.cell(row = updated_last_row - 8, column = 5).value = \
+            '=+SUM(E' + str(3 + (updated_last_row - last_row)) + ':E' + str(1 + (updated_last_row - 11)) + ')'
+        # Update CBM SUM
+        sheet.cell(row = updated_last_row - 8, column = 6).value = \
+            '=+SUM(F' + str(3 + (updated_last_row - last_row)) + ':F' + str(1 + (updated_last_row - 11)) + ')'
+        # Update Freight SUM
+        sheet.cell(row = updated_last_row - 8, column = 7).value = \
+            '=+SUM(G' + str(3 + (updated_last_row - last_row)) + ':G' + str(1 + (updated_last_row - 11)) + ')'
+        # Update Invoice SUM
+        sheet.cell(row = updated_last_row - 8, column = 8).value = \
+            '=+SUM(H' + str(3 + (updated_last_row - last_row)) + ':H' + str(1 + (updated_last_row - 11)) + ')'
+        # Update Duty + Tariff SUM
+        sheet.cell(row = updated_last_row - 8, column = 12).value = \
+            '=+SUM(L' + str(3 + (updated_last_row - last_row)) + ':L' + str(1 + (updated_last_row - 11)) + ')'
+        # Update Freight + Duty SUM
+        sheet.cell(row = updated_last_row - 8, column = 14).value = \
+            '=+SUM(N' + str(3 + (updated_last_row - last_row)) + ':N' + str(1 + (updated_last_row - 11)) + ')'
+        # Update Freight SUM
+        sheet.cell(row = updated_last_row - 8, column = 15).value = \
+            '=+SUM(O' + str(3 + (updated_last_row - last_row)) + ':O' + str(1 + (updated_last_row - 11)) + ')'
+        for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 11))):
+            # Calculate freight per row
+            sheet.cell(row = row, column = 7).value = \
+                '=F' + str(row) + '*$H$' + str(updated_last_row - 2)
+            # Sum duty and freight %'s per row
+            sheet.cell(row = row, column = 9).value = \
+                '=+K' + str(row) + '+J' + str(row)
+            # Sum the freight and duty amounts per row
+            sheet.cell(row = row, column = 12).value = \
+                '=H' + str(row) + '*((I' + str(row) + \
+                '/100)+0.003464+.00125)'
+        for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
+            # print(range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))))
+            if (sheet.cell(row = row, column = 1).value is None) and (row not in blank_rows):
+                blank_rows.append(row)
 
     print(blank_rows)
+    blank_rows_adjusted = [x - 1 for x in blank_rows[1:]]
+    def add_two(list):
+        result = []
+        for number in list:
+            result.append(number + 2)
+        result.pop()
+        result.insert(0,3)
+        return result
+    # saved_list = add_two(blank_rows_adjusted)
+    print(blank_rows_adjusted)
+    # blank_rows_adjusted.insert(0,3)
+    print(list(zip(blank_rows_adjusted, add_two(blank_rows_adjusted))))
+    # for b in range(0, len(blank_rows_adjusted)):
+    #     blank_rows_adjusted.insert(b*2, 1)
+    # print(blank_rows_adjusted)
+    
+    blank_rows_tupled = zip(blank_rows[0::2], blank_rows[1::2])
+    # print([n for n in blank_rows_tupled])
+    # print(list(blank_rows_tupled))
 
+    for n in blank_rows:
+        for first_of_sum_range, last_of_sum_range in blank_rows_tupled:
+        # # print(first_of_sum_range, last_of_sum_range)
+        # for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
+        #     # print('i')
+        #     for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
+        #         # print(row)
+        #         if sheet.cell(row = row, column = 1).value is None:
+        #             print(first_of_sum_range)
+        # print(last_of_sum_range
+            # print(n)
+            sheet.cell(row = n, column = 15).value = '=+SUM(G' + str(first_of_sum_range) + \
+                ':G' + str(last_of_sum_range) + ')'
+
+    # for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
+    #     # print(row)
+    #     if sheet.cell(row = row, column = 1).value is None:
+    #         top_of_rows = str((3 + (updated_last_row - last_row)))
+    #         bottom_of_rows = str((1 + (updated_last_row - 10)))
+    #         sheet.cell(row = row, column = 14).value = \
+    #             '=$O' + str(row)
+    #         sheet.cell(row = row, column = 15).value = \
+    #             '=+@IF(@ISNA(IFS(ISNUMBER(SEARCH("DS",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
+    #             ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I4,$B$' + top_of_rows + ':$B$' + \
+    #             bottom_of_rows + ',B' + str(row - 1) + '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
+    #             ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + \
+    #             top_of_rows + ':$B$' + bottom_of_rows + ',"DT*"))),SUMIFS($G$' + top_of_rows + ':$G$' + \
+    #             bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + \
+    #             ':$B$' + bottom_of_rows + ',"<>DS*",$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"<>DT*"),IFS(ISNUMBER(SEARCH("DS",B' + \
+    #             str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + \
+    #             bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',B' + str(row - 1) + \
+    #             '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + \
+    #             ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"DT*")))'
+
+    
+    
+    # print(blank_rows)
     new_sheet = book.create_sheet(0)
     dialog_answer = dialogue_box()
-
-    output_file_path = os.path.join(PATH, dialog_answer + '.xlsx')
+    
+    output_file_path = os.path.join(PATH2, dialog_answer + '.xlsx')
     book.save(output_file_path)
-
-    with open(os.path.join(PATH, dialog_answer + '.txt'), 'w') as file:
+    
+    with open(os.path.join(PATH2, dialog_answer + '.txt'), 'w') as file:
         for inv in invoice_list:
             file.write("%s\n" % inv)
-
+    
     return output_file_path
+
 
 run_file_combiner()
