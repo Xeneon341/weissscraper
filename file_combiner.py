@@ -3,7 +3,7 @@ import numpy as np
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH2
+from settings import PATH
 
 extracted_files, container_dict, invoice_list = extract_weiss_files()
 rows = []
@@ -128,28 +128,36 @@ def run_file_combiner():
                 blank_rows.append(row)
 
     print(blank_rows)
-    blank_rows_adjusted = [x - 1 for x in blank_rows[1:]]
+    blank_rows_bottom_adjusted = [x - 1 for x in blank_rows[1:]]
+    blank_rows_top_adjusted = [x + 1 for x in blank_rows[1:]]
+    blank_rows_top_adjusted.insert(0,blank_rows[0])
+    blank_rows_top_adjusted.pop()
+    blank_rows.pop(0)
+    print(blank_rows)
+    print(blank_rows_top_adjusted)
     def add_two(list):
         result = []
         for number in list:
             result.append(number + 2)
         result.pop()
-        result.insert(0,3)
+        # result.insert(0,3)
         return result
     # saved_list = add_two(blank_rows_adjusted)
-    print(blank_rows_adjusted)
+    print(blank_rows_bottom_adjusted)
     # blank_rows_adjusted.insert(0,3)
-    print(list(zip(blank_rows_adjusted, add_two(blank_rows_adjusted))))
+    # print(list(zip(blank_rows, add_two(blank_rows_adjusted))))
     # for b in range(0, len(blank_rows_adjusted)):
     #     blank_rows_adjusted.insert(b*2, 1)
     # print(blank_rows_adjusted)
-    
+
+    blank_rows_adj_tupled = list(zip(blank_rows[0::1], blank_rows_top_adjusted[0::1], blank_rows_bottom_adjusted[0::1]))
+    print(blank_rows_adj_tupled)
+
     blank_rows_tupled = zip(blank_rows[0::2], blank_rows[1::2])
     # print([n for n in blank_rows_tupled])
     # print(list(blank_rows_tupled))
 
-    for n in blank_rows:
-        for first_of_sum_range, last_of_sum_range in blank_rows_tupled:
+    for blank_row, first_of_sum_range, last_of_sum_range in blank_rows_adj_tupled:
         # # print(first_of_sum_range, last_of_sum_range)
         # for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
         #     # print('i')
@@ -159,8 +167,8 @@ def run_file_combiner():
         #             print(first_of_sum_range)
         # print(last_of_sum_range
             # print(n)
-            sheet.cell(row = n, column = 15).value = '=+SUM(G' + str(first_of_sum_range) + \
-                ':G' + str(last_of_sum_range) + ')'
+        sheet.cell(row = blank_row, column = 15).value = '=+SUM(G' + str(first_of_sum_range) + \
+            ':G' + str(last_of_sum_range) + ')'
 
     # for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
     #     # print(row)
@@ -182,19 +190,19 @@ def run_file_combiner():
     #             '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + \
     #             ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"DT*")))'
 
-    
-    
+
+
     # print(blank_rows)
     new_sheet = book.create_sheet(0)
     dialog_answer = dialogue_box()
-    
-    output_file_path = os.path.join(PATH2, dialog_answer + '.xlsx')
+
+    output_file_path = os.path.join(PATH, dialog_answer + '.xlsx')
     book.save(output_file_path)
-    
-    with open(os.path.join(PATH2, dialog_answer + '.txt'), 'w') as file:
+
+    with open(os.path.join(PATH, dialog_answer + '.txt'), 'w') as file:
         for inv in invoice_list:
             file.write("%s\n" % inv)
-    
+
     return output_file_path
 
 
