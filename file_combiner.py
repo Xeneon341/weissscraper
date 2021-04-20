@@ -3,7 +3,7 @@ import numpy as np
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH2
+from settings import PATH
 
 extracted_files, container_dict, invoice_list = extract_weiss_files()
 rows = []
@@ -196,10 +196,10 @@ def run_file_combiner():
     new_sheet = book.create_sheet(0)
     dialog_answer = dialogue_box()
 
-    output_file_path = os.path.join(PATH2, dialog_answer + '.xlsx')
+    output_file_path = os.path.join(PATH, dialog_answer + '.xlsx')
     book.save(output_file_path)
 
-    with open(os.path.join(PATH2, dialog_answer + '.txt'), 'w') as file:
+    with open(os.path.join(PATH, dialog_answer + '.txt'), 'w') as file:
         for inv in invoice_list:
             file.write("%s\n" % inv)
 
