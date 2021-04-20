@@ -36,8 +36,10 @@ new_new_list = np.delete(np.array(posted_invoice_line_nos_applied)[new_list],[-1
 
 # inv_line_applied_multiplier = lambda a, b: [a[i]*b[i] for i in range(len(a))]
 # inv_line_applied_multiplier = lambda a, b: [b for a]
+print(len(index_diff))
+print(len(filtered_inv_lines_to_post))
 
-final_output_sequence = np.repeat(new_new_list, index_diff)
+final_output_sequence = np.repeat(filtered_inv_lines_to_post, index_diff)
 print(final_output_sequence)
 # for i in new_new_list:
 #     for j in 3*[i]:
