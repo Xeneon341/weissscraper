@@ -127,14 +127,13 @@ def run_file_combiner():
             if (sheet.cell(row = row, column = 1).value is None) and (row not in blank_rows):
                 blank_rows.append(row)
 
-    print(blank_rows)
+
     blank_rows_bottom_adjusted = [x - 1 for x in blank_rows[1:]]
     blank_rows_top_adjusted = [x + 1 for x in blank_rows[1:]]
     blank_rows_top_adjusted.insert(0,blank_rows[0])
     blank_rows_top_adjusted.pop()
     blank_rows.pop(0)
-    print(blank_rows)
-    print(blank_rows_top_adjusted)
+
     def add_two(list):
         result = []
         for number in list:
@@ -143,7 +142,6 @@ def run_file_combiner():
         # result.insert(0,3)
         return result
     # saved_list = add_two(blank_rows_adjusted)
-    print(blank_rows_bottom_adjusted)
     # blank_rows_adjusted.insert(0,3)
     # print(list(zip(blank_rows, add_two(blank_rows_adjusted))))
     # for b in range(0, len(blank_rows_adjusted)):
@@ -151,7 +149,6 @@ def run_file_combiner():
     # print(blank_rows_adjusted)
 
     blank_rows_adj_tupled = list(zip(blank_rows[0::1], blank_rows_top_adjusted[0::1], blank_rows_bottom_adjusted[0::1]))
-    print(blank_rows_adj_tupled)
 
     blank_rows_tupled = zip(blank_rows[0::2], blank_rows[1::2])
     # print([n for n in blank_rows_tupled])

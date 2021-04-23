@@ -164,3 +164,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Output files
+out_columns.csv
