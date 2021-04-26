@@ -1,6 +1,6 @@
 from ctypes.util import find_library
 from ctypes import *
-from docx.api import Document
+# from docx.api import Document
 import camelot, os, docx2txt
 import pandas as pd
 
@@ -10,15 +10,17 @@ print(cwd)
 
 print(find_library("".join(("gsdll", str(sizeof(c_voidp) * 8), ".dll"))))
 
-# tables = camelot.read_pdf('./static/test2.PDF', pages='all', flavor="stream", cols=5, edge_tol=500)
-# print(tables)
+tables = camelot.read_pdf('./static/test.PDF', process_background=True, pages='all')
+# process_background=True, cols=5, edge_tol=500)
+# , flavor="stream"
+print(tables[0].parsing_report)
 
 # tables.export('test2.csv', f='csv', compress=True) # json, excel, html, sqlite
 # print(tables[:])
 # [n for n in tables].parsing_report
 # #
 # tables[0].to_csv('test2.csv') # to_json, to_excel, to_html, to_sqlite
-# tables[0].df # get a pandas DataFrame!
+print(tables[0].df) # get a pandas DataFrame!
 # for n in tables:
 #     print(n.df)
 
@@ -50,5 +52,5 @@ print(find_library("".join(("gsdll", str(sizeof(c_voidp) * 8), ".dll"))))
 
 # df = pd.DataFrame(data)
 
-my_text = docx2txt.process("INVOICE--20HR5097.docx")
-print(my_text)
+# my_text = docx2txt.process("INVOICE--20HR5097.docx")
+# print(my_text)
