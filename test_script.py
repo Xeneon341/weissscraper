@@ -1,7 +1,9 @@
 from ctypes.util import find_library
 from ctypes import *
 # from docx.api import Document
-import camelot, os, docx2txt
+import camelot
+import os
+import docx2txt
 import pandas as pd
 
 pd.set_option("display.max_columns", None)
@@ -20,7 +22,7 @@ print(tables[0].parsing_report)
 # [n for n in tables].parsing_report
 # #
 # tables[0].to_csv('test2.csv') # to_json, to_excel, to_html, to_sqlite
-print(tables[0].df) # get a pandas DataFrame!
+print(tables[0].df)  # get a pandas DataFrame!
 # for n in tables:
 #     print(n.df)
 
