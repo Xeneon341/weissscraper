@@ -167,4 +167,8 @@ $RECYCLE.BIN/
 *.lnk
 
 # Output files
-out_columns.csv
+*.csv
+*.xlsx
+*.xls
+*.doc
+*.docx
