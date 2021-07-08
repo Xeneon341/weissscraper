@@ -6,11 +6,11 @@ from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
 from settings import PATH
 
-extracted_files, container_dict, invoice_list = extract_weiss_files()
+extracted_files, container_dict, invoice_list, container_list_dict_values = extract_weiss_files()
 rows = []
 data_rows = []
 last_empty_row_list = []
-container_list_dict_values = list(container_dict.values())
+# container_list_dict_values = list(container_dict.values())
 
 
 def dialogue_box():
@@ -24,7 +24,6 @@ def run_file_combiner():
 
     for i in extracted_files:
         wb_data_only = load_workbook(filename=i, data_only=True)
-
         sheet_ranges_data_only = wb_data_only['FinalHardCoded']
 
         last_empty_row = len(list(sheet_ranges_data_only.rows))

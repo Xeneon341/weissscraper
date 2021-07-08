@@ -9,6 +9,7 @@ def extract_weiss_files():
     filelist = []
     filtered_filelist = []
     invoice_list = []
+    container_values = []
 
     loc = (os.path.join(PATH, "Templates\container_config.xls"))
 
@@ -33,12 +34,13 @@ def extract_weiss_files():
                 filtered_filelist.append(str)
                 invoice_list.append(re.findall(pattern, str))
                 container_list_dict_values.remove(sub)
+                container_values.append(container_list_dict[sub])
                 # filtered_filelist.append(str for str in string if
                 #                         any(sub in str for sub in substr))
 
     invoice_list = [n for item in invoice_list for n in item]
 
-    return filtered_filelist, container_list_dict, invoice_list
+    return filtered_filelist, container_list_dict, invoice_list, container_values
 
 
 def extract_from_export_file():
