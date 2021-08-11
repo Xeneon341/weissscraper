@@ -21,7 +21,7 @@ def extract_weiss_files():
                               sheet.col_values(1, start_rowx=1, end_rowx=None)))
 
     container_list_dict = dict(container_list)
-    container_list_dict_values = list(container_list_dict.keys())
+    container_list_dict_values = list(filter(lambda x: x != "", list(container_list_dict.keys())))
 
     for root, dirs, files in os.walk(PATH):
         for file in files:
