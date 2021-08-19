@@ -172,3 +172,5 @@ $RECYCLE.BIN/
 *.xls
 *.doc
 *.docx
+*.ipynb
+*.zip
