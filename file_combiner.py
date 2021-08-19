@@ -1,16 +1,23 @@
+# Weiss Multi-Duty File Scraper
+
+# The purpose of this script is to generate a consolidated spreadsheet containing all item allocations
+# pertaining to each container from a Weiss-Rohlig consolidated surcharge invoice. It first
+# takes in as input what extract_weiss_files() was able to extract, parses through the desired columns and rows,
+# and then outputs the consolidated spreadsheet under /NP-Share/Weiss/ along with a .txt file under /Weiss/Templates
+# containing a summary of invoice numbers it was successfully able to find and scrape.
+
 import os
 import easygui
 import numpy as np
 
 from extract_files import extract_weiss_files
 from openpyxl import load_workbook, Workbook
-from settings import PATH
+from settings import WEISS_PATH
 
 extracted_files, container_dict, invoice_list, container_list_dict_values = extract_weiss_files()
 rows = []
 data_rows = []
 last_empty_row_list = []
-# container_list_dict_values = list(container_dict.values())
 
 
 def dialogue_box():
@@ -46,13 +53,9 @@ def run_file_combiner():
     for row in tupled_rows:
         sheet.append(row)
 
-    # print([n for n in zip(updated_empty_rows, last_empty_row_list)])
-
     for amount, updated_last_row in zip(container_list_dict_values, updated_empty_rows):
         # Update Invoice Amount
         sheet.cell(row=updated_last_row - 4, column=8).value = amount
-
-    # print(updated_empty_rows)
 
     for updated_last_row in updated_empty_rows:
         # Update CM3 Multiplier Cell
@@ -89,7 +92,6 @@ def run_file_combiner():
             '=+H' + str(updated_last_row - 4)
 
     for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
-        # print(updated_last_row)
         # Update Quantity SUM
         sheet.cell(row=updated_last_row - 8, column=5).value = \
             '=+SUM(E' + str(3 + (updated_last_row - last_row)) + \
@@ -130,7 +132,6 @@ def run_file_combiner():
                 '=H' + str(row) + '*((I' + str(row) + \
                 '/100)+0.003464+.00125)'
         for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
-            # print(range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))))
             if (sheet.cell(row=row, column=1).value is None) and (row not in blank_rows):
                 blank_rows.append(row)
 
@@ -145,63 +146,25 @@ def run_file_combiner():
         for number in list:
             result.append(number + 2)
         result.pop()
-        # result.insert(0,3)
+
         return result
-    # saved_list = add_two(blank_rows_adjusted)
-    # blank_rows_adjusted.insert(0,3)
-    # print(list(zip(blank_rows, add_two(blank_rows_adjusted))))
-    # for b in range(0, len(blank_rows_adjusted)):
-    #     blank_rows_adjusted.insert(b*2, 1)
-    # print(blank_rows_adjusted)
 
     blank_rows_adj_tupled = list(
         zip(blank_rows[0::1], blank_rows_top_adjusted[0::1], blank_rows_bottom_adjusted[0::1]))
 
     blank_rows_tupled = zip(blank_rows[0::2], blank_rows[1::2])
-    # print([n for n in blank_rows_tupled])
-    # print(list(blank_rows_tupled))
 
     for blank_row, first_of_sum_range, last_of_sum_range in blank_rows_adj_tupled:
-        # # print(first_of_sum_range, last_of_sum_range)
-        # for updated_last_row, last_row in zip(updated_empty_rows, last_empty_row_list):
-        #     # print('i')
-        #     for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
-        #         # print(row)
-        #         if sheet.cell(row = row, column = 1).value is None:
-        #             print(first_of_sum_range)
-        # print(last_of_sum_range
-        # print(n)
         sheet.cell(row=blank_row, column=15).value = '=+SUM(G' + str(first_of_sum_range) + \
             ':G' + str(last_of_sum_range) + ')'
 
-    # for row in range((3 + (updated_last_row - last_row)), (1 + (updated_last_row - 10))):
-    #     # print(row)
-    #     if sheet.cell(row = row, column = 1).value is None:
-    #         top_of_rows = str((3 + (updated_last_row - last_row)))
-    #         bottom_of_rows = str((1 + (updated_last_row - 10)))
-    #         sheet.cell(row = row, column = 14).value = \
-    #             '=$O' + str(row)
-    #         sheet.cell(row = row, column = 15).value = \
-    #             '=+@IF(@ISNA(IFS(ISNUMBER(SEARCH("DS",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
-    #             ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I4,$B$' + top_of_rows + ':$B$' + \
-    #             bottom_of_rows + ',B' + str(row - 1) + '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + \
-    #             ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + \
-    #             top_of_rows + ':$B$' + bottom_of_rows + ',"DT*"))),SUMIFS($G$' + top_of_rows + ':$G$' + \
-    #             bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + \
-    #             ':$B$' + bottom_of_rows + ',"<>DS*",$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"<>DT*"),IFS(ISNUMBER(SEARCH("DS",B' + \
-    #             str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + ',$I$' + top_of_rows + ':$I$' + \
-    #             bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',B' + str(row - 1) + \
-    #             '),ISNUMBER(SEARCH("DT",B' + str(row - 1) + ')),SUMIFS($G$' + top_of_rows + ':$G$' + bottom_of_rows + \
-    #             ',$I$' + top_of_rows + ':$I$' + bottom_of_rows + ',I' + str(row - 1) + ',$B$' + top_of_rows + ':$B$' + bottom_of_rows + ',"DT*")))'
-
-    # print(blank_rows)
     new_sheet = book.create_sheet(0)
     dialog_answer = dialogue_box()
 
-    output_file_path = os.path.join(PATH, dialog_answer + '.xlsx')
+    output_file_path = os.path.join(WEISS_PATH, dialog_answer + '.xlsx')
     book.save(output_file_path)
 
-    with open(os.path.join(PATH, dialog_answer + '.txt'), 'w') as file:
+    with open(os.path.join(WEISS_PATH, dialog_answer + '.txt'), 'w') as file:
         for inv in invoice_list:
             file.write("%s\n" % inv)
 
