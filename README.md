@@ -19,7 +19,7 @@ Duplicates of any row from these first two columns represent multiple items bein
 column represents a filtered list of invoice line no.'s the end-user has already prepared in advanced for any invoice charge line desired for applying
 to items.
 
-The script operates first by creating a list beginning with the first item in the "filtered invoice line no.'s" to be posted column.
+The script operates first by creating a list beginning with the first item in the "filtered invoice line no.'s to be posted" column.
 It then reads down the rows of columns A and B and either repeats the current iterated filter invoice line no. and appends
 to the list if there are no changes in sequences from either of the first two columns. Once the break in sequence occurs, the script
 increments the current iteration by 10,000 and repeats the process until it has exhausted the number of rows from column's A and B.
