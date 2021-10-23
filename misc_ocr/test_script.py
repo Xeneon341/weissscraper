@@ -1,10 +1,12 @@
 from ctypes.util import find_library
 from ctypes import *
+import tkinter
 # from docx.api import Document
 import camelot
 import os
 import docx2txt
 import pandas as pd
+import matplotlib as plot
 
 pd.set_option("display.max_columns", None)
 cwd = r"C:\Users\alext\Google Drive\weissscraper\static"
@@ -12,17 +14,21 @@ print(cwd)
 
 print(find_library("".join(("gsdll", str(sizeof(c_voidp) * 8), ".dll"))))
 
-tables = camelot.read_pdf('./static/test.PDF', process_background=True, pages='all')
-# process_background=True, cols=5, edge_tol=500)
-# , flavor="stream"
-print(tables[0].parsing_report)
+tables = camelot.read_pdf('Detail Templates Report (1).pdf', flavor='stream', pages='all')
 
-# tables.export('test2.csv', f='csv', compress=True) # json, excel, html, sqlite
+# , process_background=True, pages='1', cols=5)
+camelot.plot(tables[0], kind='text').show()
+
+table_concat = pd.concat(tables)
+
+print(tables)
+
+table_concat.export('test.csv', f='csv', compress=True) # json, excel, html, sqlite
 # print(tables[:])
 # [n for n in tables].parsing_report
 # #
 # tables[0].to_csv('test2.csv') # to_json, to_excel, to_html, to_sqlite
-print(tables[0].df)  # get a pandas DataFrame!
+# print(tables[0].df)  # get a pandas DataFrame!
 # for n in tables:
 #     print(n.df)
 
