@@ -67,7 +67,7 @@ def generate_inv_line_nos_for_items_application(**kwargs):
                                            indices_of_posted_inv_no_diffs)))
 
     final_output_item_applied_sequence = np.repeat(
-        filtered_inv_lines_to_post, index_diff)
+        filtered_inv_lines_to_post, index_diff.astype(int))
 
     index_inv_line_diffs_charge_assign_diffs = np.insert(np.where(
         np.diff(np.append(final_output_item_applied_sequence, 0)) != 0)[0] + 1, 0, 0)
